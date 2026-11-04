@@ -1,0 +1,653 @@
+<style>
+#dash-root { --dash-gutter: var(--cds-pad-lg); }
+.rp { font-family: var(--font-anthropic-sans); display: flex; flex-direction: column; gap: var(--cds-gap-lg); max-width: 84rem; margin-inline: auto; }
+.rp h1 { font-family: var(--font-anthropic-serif); font-weight: 400; font-size: var(--cds-font-size-title); margin: 0; text-wrap: balance; }
+.rp .lede { margin: 0; color: var(--color-fg-muted); max-width: 72ch; line-height: 1.5; }
+.rp .lede b, .rp .note b, .rp .r2line b { color: var(--color-fg); font-weight: 600; font-variant-numeric: tabular-nums; }
+.rp .tabs { display: flex; flex-wrap: wrap; gap: var(--cds-gap-xs); border-bottom: 1px solid var(--color-border-line); }
+.rp .tab { appearance: none; background: none; border: 0; border-bottom: 2px solid transparent; margin-bottom: -1px; padding: var(--cds-pad-sm) var(--cds-pad-md); font: inherit; color: var(--color-fg-muted); cursor: pointer; }
+.rp .tab:hover { color: var(--color-fg); }
+.rp .tab[aria-selected="true"] { color: var(--color-fg); border-bottom-color: var(--color-fg); }
+.rp .tab:focus-visible, .rp select:focus-visible, .rp input:focus-visible { outline: 2px solid var(--color-fg); outline-offset: 2px; }
+.rp section { display: flex; flex-direction: column; gap: var(--cds-gap-md); }
+.rp .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 22rem), 1fr)); gap: var(--cds-gap-md); }
+.rp .card { background: var(--color-panel); border: 1px solid var(--color-border-line); border-radius: var(--cds-radius); padding: var(--cds-pad-lg); display: flex; flex-direction: column; gap: var(--cds-gap-sm); min-width: 0; }
+.rp .card h2 { font-size: var(--cds-font-size-heading); font-weight: var(--cds-font-weight-medium); margin: 0; text-wrap: balance; }
+.rp .card h3 { font-size: var(--cds-font-size-body); font-weight: var(--cds-font-weight-medium); margin: 0; }
+.rp .note { font-size: var(--cds-font-size-caption); color: var(--color-fg-muted); margin: 0; line-height: 1.45; }
+.rp .r2line { font-size: var(--cds-font-size-caption); color: var(--color-fg-muted); margin: 0; }
+.rp .tiles { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 12rem), 1fr)); gap: var(--cds-gap-md); }
+.rp .tile { gap: var(--cds-gap-xs); }
+.rp .tile .lbl { font-size: var(--cds-font-size-caption); color: var(--color-fg-muted); }
+.rp .tile .big { font-family: var(--font-anthropic-serif); font-weight: 400; font-size: var(--cds-font-size-title); font-variant-numeric: tabular-nums; }
+.rp .scroll { overflow: auto; max-height: 30rem; }
+.rp table { border-collapse: collapse; width: 100%; font-size: var(--cds-font-size-caption); font-variant-numeric: tabular-nums; }
+.rp th { text-align: left; font-weight: var(--cds-font-weight-medium); color: var(--color-fg-muted); padding: var(--cds-pad-xs) var(--cds-pad-sm); border-bottom: 1px solid var(--color-border-line); position: sticky; top: 0; background: var(--color-panel); }
+.rp td { padding: var(--cds-pad-xs) var(--cds-pad-sm); border-bottom: 1px solid var(--color-border-line); }
+.rp th.n, .rp td.n { text-align: right; }
+.rp .chip { display: inline-block; padding: 0 var(--cds-pad-xs); border-radius: var(--cds-radius); border: 1px solid currentColor; white-space: nowrap; }
+.rp .chip.ok { color: var(--color-ok); }
+.rp .chip.warn { color: var(--color-warn); }
+.rp .chip.bad { color: var(--color-bad); }
+.rp .controls { display: flex; flex-wrap: wrap; gap: var(--cds-gap-sm); align-items: center; font-size: var(--cds-font-size-caption); }
+.rp select, .rp input[type="search"] { font: inherit; color: var(--color-fg); background: var(--color-bg); border: 1px solid var(--color-border-line); border-radius: var(--cds-radius); padding: var(--cds-pad-xs) var(--cds-pad-sm); max-width: 100%; }
+.rp .chart { position: relative; min-height: 16rem; }
+.rp .chart.tall { min-height: 22rem; }
+.rp .legend { display: flex; flex-wrap: wrap; gap: var(--cds-gap-md); font-size: var(--cds-font-size-caption); color: var(--color-fg-muted); }
+.rp .sw { display: inline-block; width: 0.75rem; height: 0.2rem; border-radius: 1px; vertical-align: middle; margin-right: var(--cds-pad-xs); background: var(--cds-chart-muted); }
+.rp svg text { fill: var(--color-fg-muted); font-size: var(--cds-font-size-caption); font-family: var(--font-anthropic-sans); }
+.rp svg .tick line { stroke: var(--cds-chart-grid); }
+.rp svg .domain { stroke: var(--cds-chart-axis); }
+.rp .rp-tip { position: absolute; background: var(--cds-surface-popover); border: 1px solid var(--cds-border); border-radius: var(--cds-radius); box-shadow: var(--cds-shadow-popover); padding: var(--cds-pad-xs) var(--cds-pad-sm); font-size: var(--cds-font-size-caption); pointer-events: none; white-space: nowrap; z-index: 2; }
+.rp .rp-tip .h { color: var(--cds-text-secondary); }
+.rp .rp-fail { display: flex; align-items: center; justify-content: center; gap: var(--cds-gap-xs); min-height: inherit; color: var(--color-fg-muted); font-size: var(--cds-font-size-caption); }
+.rp .rp-fail::before { content: ""; width: 0.375rem; height: 0.375rem; border-radius: 50%; background: var(--color-bad); }
+.rp [data-dash-source-state="empty"] { color: transparent; }
+.rp [data-dash-source-state="refreshing"] { opacity: .5; transition: opacity var(--cds-dur-slow); }
+.rp code, .rp pre { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: var(--cds-font-size-caption); }
+.rp pre { margin: 0; padding: var(--cds-pad-sm); background: var(--color-bg); border: 1px solid var(--color-border-line); border-radius: var(--cds-radius); overflow-x: auto; }
+.rp .dot { display: inline-block; width: 0.6rem; height: 0.6rem; border-radius: 50%; vertical-align: middle; margin-right: var(--cds-pad-xs); }
+.rp .dot.ring { border: 1.5px solid var(--color-fg-muted); }
+.rp .dot.fill { background: var(--cds-chart-series-0, #3266ad); }
+.rp .sq { display: inline-block; width: 0.7rem; height: 0.7rem; border-radius: 2px; vertical-align: middle; margin-right: var(--cds-pad-xs); background: var(--cds-chart-muted); }
+.rp .sq.empty { background: none; border: 1px dashed var(--color-fg-muted); }
+.rp .new { font-size: var(--cds-font-size-caption); font-weight: 400; color: var(--color-fg-muted); border: 1px solid var(--color-border-line); border-radius: 99px; padding: 0 var(--cds-pad-sm); margin-left: var(--cds-pad-xs); vertical-align: middle; white-space: nowrap; }
+.rp .finding { margin: 0; line-height: 1.5; max-width: 72ch; }
+.rp .finding b { font-weight: 600; font-variant-numeric: tabular-nums; }
+.rp ul { margin: 0; padding-left: 1.2rem; display: flex; flex-direction: column; gap: var(--cds-gap-xs); line-height: 1.5; }
+</style>
+
+<div class="rp">
+  <header class="card" style="background: none; border: 0; padding: 0;">
+    <h1 id="title">HECAP Africa</h1>
+    <p class="lede">High-energy physics, cosmology and astroparticle physics in the 54 African countries, from INSPIRE-HEP: <b data-draw="value" data-source="scalars" data-field="value" data-where="id=region_papers" data-fmt="int">—</b> papers with ten or fewer authors and an African affiliation, by authors from <b data-draw="value" data-source="scalars" data-field="value" data-where="id=countries" data-fmt="int">—</b> countries. The indicators follow the study of Latin America by Morales-Alvarado, Quevedo, Ramos-Hamud and Restrepo (restrepo/inspireauth).</p>
+  </header>
+
+  <nav class="tabs" role="tablist" aria-label="Sections">
+    <button class="tab" role="tab" data-tab="overview" aria-selected="true">Overview</button>
+    <button class="tab" role="tab" data-tab="tables" aria-selected="false">Tables</button>
+    <button class="tab" role="tab" data-tab="correlations" aria-selected="false">Correlations</button>
+    <button class="tab" role="tab" data-tab="trends" aria-selected="false">Regional trends</button>
+    <button class="tab" role="tab" data-tab="mobility" aria-selected="false">Ranks &amp; mobility</button>
+    <button class="tab" role="tab" data-tab="collaborations" aria-selected="false">Collaborations</button>
+    <button class="tab" role="tab" data-tab="gender" aria-selected="false">Gender</button>
+    <button class="tab" role="tab" data-tab="method" aria-selected="false">Method</button>
+  </nav>
+
+  <section id="overview" role="tabpanel">
+    <div class="tiles">
+      <div class="card tile"><span class="lbl">Distinct authors</span><span class="big" data-draw="value" data-source="scalars" data-field="value" data-where="id=authors" data-fmt="int">—</span><span class="note">Of African papers and their co-authors</span></div>
+      <div class="card tile"><span class="lbl">Distinct papers</span><span class="big" data-draw="value" data-source="scalars" data-field="value" data-where="id=papers" data-fmt="int">—</span><span class="note">Ten or fewer authors</span></div>
+      <div class="card tile"><span class="lbl">Authors with a declared rank</span><span class="big" data-draw="value" data-source="scalars" data-field="value" data-where="id=rank_authors" data-fmt="int">—</span><span class="note">In their INSPIRE profile</span></div>
+      <div class="card tile"><span class="lbl">Authors with inferred gender</span><span class="big" data-draw="value" data-source="scalars" data-field="value" data-where="id=gender_known" data-fmt="int">—</span><span class="note">Probability 0.9 or more</span></div>
+    </div>
+
+    <div class="grid">
+      <div class="card" id="pubs-dots">
+        <h2>Publications by country</h2>
+        <p class="note">Articles with ten or fewer authors and at least one author affiliated in the country (log scale); countries with at least one article.</p>
+        <div class="chart tall" data-draw="pubs-dots" data-source="country_metrics"></div>
+      </div>
+      <div class="card" id="r2">
+        <h2>R² against R&amp;D and HDI</h2>
+        <p class="note">Linear fits of authors, publications and citations per million inhabitants against R&amp;D (average % of GDP, World Bank) and HDI (average 1990–2022, UNDP), over the countries with articles and data.</p>
+        <div class="scroll">
+          <table data-source="scalars" data-row-key="id">
+            <thead><tr><th data-field="label">Fit</th><th class="n" data-field="n">Countries</th><th class="n" data-field="value">R²</th></tr></thead>
+            <tbody data-draw="r2-body"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+  </section>
+
+  <section id="tables" role="tabpanel" hidden>
+    <div class="card">
+      <h2>Indicator tables</h2>
+      <p class="note">The indicators of each African country with articles, as in Tables 5–7 and 10–12 of the Latin American study. PMI: per million inhabitants.</p>
+      <div class="controls">
+        <label for="rp-table">Table</label>
+        <select id="rp-table" data-draw="table-select" data-source="table_cells"></select>
+        <input id="rp-search" type="search" placeholder="Filter by country or column" aria-label="Filter rows">
+      </div>
+      <div class="scroll">
+        <table data-source="table_cells" data-row-key="id">
+          <thead><tr><th data-field="country">Country</th><th data-field="column">Column</th><th class="n" data-field="value">Value</th></tr></thead>
+          <tbody data-draw="cells-body"></tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <section id="correlations" role="tabpanel" hidden>
+    <p class="note">Each point is a country; the line is the least-squares fit recomputed on this page from the country metrics. Countries without R&amp;D or HDI data are left out of those fits.</p>
+    <div class="grid">
+      <div class="card"><h2>Authors per million inhabitants vs R&amp;D</h2><p class="r2line">R² <b data-draw="value" data-source="fits" data-field="r2" data-where="fit=authors_pmi|rd_avg" data-fmt="r2">—</b></p><div class="chart" data-draw="scatter" data-source="country_metrics fits" data-metric="authors_pmi" data-x="rd_avg"></div><p class="note">x: R&amp;D, average % of GDP since 1996 (World Bank)</p></div>
+      <div class="card"><h2>Publications per million inhabitants vs R&amp;D</h2><p class="r2line">R² <b data-draw="value" data-source="fits" data-field="r2" data-where="fit=papers_pmi|rd_avg" data-fmt="r2">—</b></p><div class="chart" data-draw="scatter" data-source="country_metrics fits" data-metric="papers_pmi" data-x="rd_avg"></div><p class="note">x: R&amp;D, average % of GDP since 1996 (World Bank)</p></div>
+      <div class="card"><h2>Citations per million inhabitants vs R&amp;D</h2><p class="r2line">R² <b data-draw="value" data-source="fits" data-field="r2" data-where="fit=citations_pmi|rd_avg" data-fmt="r2">—</b></p><div class="chart" data-draw="scatter" data-source="country_metrics fits" data-metric="citations_pmi" data-x="rd_avg"></div><p class="note">x: R&amp;D, average % of GDP since 1996 (World Bank)</p></div>
+      <div class="card"><h2>Authors per million inhabitants vs HDI</h2><p class="r2line">R² <b data-draw="value" data-source="fits" data-field="r2" data-where="fit=authors_pmi|hdi_avg" data-fmt="r2">—</b></p><div class="chart" data-draw="scatter" data-source="country_metrics fits" data-metric="authors_pmi" data-x="hdi_avg"></div><p class="note">x: HDI, average 1990–2022 (UNDP)</p></div>
+      <div class="card"><h2>Publications per million inhabitants vs HDI</h2><p class="r2line">R² <b data-draw="value" data-source="fits" data-field="r2" data-where="fit=papers_pmi|hdi_avg" data-fmt="r2">—</b></p><div class="chart" data-draw="scatter" data-source="country_metrics fits" data-metric="papers_pmi" data-x="hdi_avg"></div><p class="note">x: HDI, average 1990–2022 (UNDP)</p></div>
+      <div class="card"><h2>Citations per million inhabitants vs HDI</h2><p class="r2line">R² <b data-draw="value" data-source="fits" data-field="r2" data-where="fit=citations_pmi|hdi_avg" data-fmt="r2">—</b></p><div class="chart" data-draw="scatter" data-source="country_metrics fits" data-metric="citations_pmi" data-x="hdi_avg"></div><p class="note">x: HDI, average 1990–2022 (UNDP)</p></div>
+    </div>
+  </section>
+
+  <section id="trends" role="tabpanel" hidden>
+    <div class="card" id="share">
+      <h2>African share of the global output</h2>
+      <p class="note">African papers (counted once for the region) and their citations, as a percentage of all citable INSPIRE-HEP papers with ten or fewer authors published in the same year (global totals of the Latin American study, which end in 2021).</p>
+      <div class="legend"><span><i class="sw" data-i="0"></i>Publications</span><span><i class="sw" data-i="1"></i>Citations</span></div>
+      <div class="chart tall" data-draw="share-chart" data-source="region_share"></div>
+    </div>
+    <div class="card" id="per-year">
+      <h2>Articles per year</h2>
+      <p class="note">Articles with at least one author affiliated in the country, by publication year; <i>All Africa</i> counts each article once for the region. The current year is partial and left out.</p>
+      <div class="controls"><label for="rp-country">Country</label><select id="rp-country" data-draw="country-select" data-source="papers_per_year"></select></div>
+      <div class="chart" data-draw="year-chart" data-source="papers_per_year"></div>
+    </div>
+  </section>
+
+  <section id="mobility" role="tabpanel" hidden>
+    <div class="card" id="rank-paper">
+      <h2>Ranks and where they published</h2>
+      <p class="note">Authors with a declared rank in the chosen country, by the rank under which they published an article and where that rank was held: the same country, another African country, or outside Africa. A publication counts once per institution, rank and period, as in the Latin American study (Figs. 4 and 37–39 there).</p>
+      <div class="controls"><label for="rp-mob-country">Country</label><select id="rp-mob-country" data-draw="mob-select" data-source="mobility"></select></div>
+      <div class="legend"><span><i class="sq" data-i="0"></i>Same country</span><span><i class="sq" data-i="2"></i>Other African country</span><span><i class="sq" data-i="1"></i>Outside Africa</span></div>
+      <div class="chart tall" data-draw="mob-chart" data-source="mobility"></div>
+    </div>
+    <div class="card" id="phd-destination">
+      <h2>Where African PhDs go next</h2>
+      <p class="note">Authors who held a PhD position in an African country, by where they hold their current position (else their latest later one, not counting student or visitor ranks). Countries with at least 10 such authors.</p>
+      <p class="finding" data-draw="phd-finding" data-source="phd_destination">—</p>
+      <div class="legend"><span><i class="sq" data-i="0"></i>Same country</span><span><i class="sq" data-i="2"></i>Other African country</span><span><i class="sq" data-i="1"></i>Outside Africa</span><span><i class="sq muted"></i>Country not known</span><span><i class="sq empty"></i>No later position</span></div>
+      <div class="chart" data-draw="phd-chart" data-source="phd_destination"></div>
+    </div>
+  </section>
+
+  <section id="collaborations" role="tabpanel" hidden>
+    <div class="card" id="collab-la">
+      <h2>Collaborations between African countries</h2>
+      <p class="note">Row country's articles co-authored with the column country, in %, for the countries with articles.</p>
+      <div class="chart tall" data-draw="heatmap" data-source="collab" data-scope="Africa"></div>
+    </div>
+    <div class="card" id="collab-world">
+      <h2>Collaborations with other countries</h2>
+      <p class="note">Same indicator for Spain, Portugal, Germany, Italy, France, the United Kingdom, the Russian Federation, Belgium, Canada and the United States.</p>
+      <div class="chart tall" data-draw="heatmap" data-source="collab" data-scope="World"></div>
+    </div>
+  </section>
+
+  <section id="gender" role="tabpanel" hidden>
+    <div class="card" id="female-year">
+      <h2>Female fraction of authors per year</h2>
+      <p class="note">Distinct authors who published in each year with a gender inferred at probability 0.9 or more; the band is the 95% margin of error. Genders are inferred from first name and country with the genderize-offline package (World Gender Name Dictionary 2.0).</p>
+      <div class="chart tall" data-draw="gender-chart" data-source="gender_year"></div>
+    </div>
+    <div class="card" id="female-rank">
+      <h2>Female fraction by rank</h2>
+      <p class="note">Authors holding a declared rank in a year in which they published, with the female fraction and its 95% margin.</p>
+      <div class="scroll">
+        <table data-source="gender_rank" data-row-key="group">
+          <thead><tr><th data-field="group">Rank</th><th class="n" data-field="authors">Authors</th><th class="n" data-field="female_pct">Female %</th></tr></thead>
+          <tbody data-draw="gender-rank-body"></tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <section id="method" role="tabpanel" hidden>
+    <div class="grid">
+      <div class="card">
+        <h2>Counting rules</h2>
+        <p class="note">The same rules as the Latin American study (repository restrepo/inspireauth), applied to the 54 African countries.</p>
+        <ul class="note">
+          <li>Institutions of a country: INSPIRE-HEP institutions whose first address has the country's ISO code. Their papers with ten or fewer authors, each counted once.</li>
+          <li>Every author of those papers is a record per author and institution, with the INSPIRE profile; the country of a record is that of its institution.</li>
+          <li>A country's papers are the papers of its author records whose affiliation is one of the country's institutions; authors are the distinct INSPIRE BAIs among its records; an author is active with a paper from the last five years.</li>
+          <li>Citations are summed over the country's papers; the h-index is computed on them.</li>
+          <li>Per million inhabitants uses the latest World Bank population; R&amp;D is the World Bank average since 1996, HDI the UNDP average 1990–2022.</li>
+          <li>Collaboration: share of the row country's papers that also belong to the column country.</li>
+          <li>Ranks and mobility: authors with a declared rank in a country and the distinct institution, rank and period of the ranked papers they published.</li>
+          <li>Gender: inferred from the first given name and the country of the author's first record with genderize-offline (World Gender Name Dictionary 2.0); known at probability 0.9 or more.</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h2>Run it yourself</h2>
+        <p class="note">The scripts are in the repository restrepo/inspireauth_CfA. They need Python and the genderize-offline package; the download from INSPIRE-HEP takes tens of minutes, the rest a few seconds.</p>
+<pre>pip install -r reproduce/requirements.txt
+python build/build_inspire.py
+python reproduce/reproduce.py data/inspire_Africa.json.gz results.json
+python reproduce/tables.py results.json page_data.json
+python reproduce/export_dashboard.py page_data.json dash/
+python reproduce/standalone.py dash/ board.html</pre>
+      </div>
+    </div>
+  </section>
+</div>
+
+<script>
+const rp = window.rp = {
+  int: d3.format(','),
+  num: (v) => v == null || v === '' ? '—' : Number.isInteger(+v) ? d3.format(',')(+v) : d3.format(',.2~f')(+v),
+  r2: d3.format('.3f'),
+  ui: { table: null, q: '', country: 'All Africa', mobCountry: 'South Africa' },
+  statusWord: { exact: ['Same', 'ok'], rounded: ['Rounded', 'ok'], truncated: ['Truncated in paper', 'warn'], differs: ['Differs', 'bad'] },
+};
+rp.ready = (el, ids) => {
+  const st = ids.map((id) => dash.data(id).status);
+  if (st.every((s) => s === 'ok')) { el.classList.remove('dash-skeleton'); return true; }
+  el.replaceChildren();
+  if (st.some((s) => s === 'error' || s === 'connect' || s === 'missing' || s === 'declined')) {
+    el.classList.remove('dash-skeleton');
+    const f = document.createElement('div'); f.className = 'rp-fail'; f.textContent = 'Failed to load'; el.appendChild(f);
+  } else el.classList.add('dash-skeleton');
+  return false;
+};
+rp.tip = (el) => {
+  const t = document.createElement('div'); t.className = 'rp-tip'; t.hidden = true; el.appendChild(t);
+  return {
+    show(lines, x, y) {
+      t.replaceChildren(...lines.map((l, i) => { const d = document.createElement('div'); d.textContent = l; if (i === 0) d.className = 'h'; return d; }));
+      t.hidden = false;
+      t.style.left = Math.max(0, Math.min(x + 12, el.clientWidth - t.offsetWidth)) + 'px';
+      t.style.top = Math.max(0, y - t.offsetHeight - 8) + 'px';
+    },
+    hide() { t.hidden = true; },
+  };
+};
+rp.textW = (svg, strs) => {
+  const g = svg.append('g');
+  const w = d3.max(strs, (s) => g.append('text').text(s).node().getComputedTextLength()) || 0;
+  g.remove();
+  return w;
+};
+rp.cell = (tr, text, cls) => { const td = document.createElement('td'); td.textContent = text; if (cls) td.className = cls; tr.appendChild(td); return td; };
+rp.chip = (tr, status) => {
+  const [w, c] = rp.statusWord[status] || [status, ''];
+  const td = document.createElement('td'); const s = document.createElement('span'); s.className = 'chip ' + c; s.textContent = w; td.appendChild(s); tr.appendChild(td);
+};
+rp.row = (tbody, key) => { const tr = document.createElement('tr'); tr.dataset.key = key; tbody.appendChild(tr); return tr; };
+rp.axes = (svg, x, y, W, H, ml, mb, xfmt, yfmt) => {
+  svg.append('g').attr('transform', `translate(${ml},0)`).call(d3.axisLeft(y).ticks(5).tickSize(-(W - ml - 8)).tickFormat(yfmt))
+    .attr('font-size', null).attr('font-family', null).call((g) => g.select('.domain').remove());
+  svg.append('g').attr('transform', `translate(0,${H - mb})`).call(d3.axisBottom(x).ticks(Math.max(2, Math.floor((W - ml) / 70))).tickFormat(xfmt))
+    .attr('font-size', null).attr('font-family', null);
+};
+
+dash.calc('fits', {
+  inputs: ['country_metrics'],
+  title: 'Linear fits and R²',
+  description: 'Least-squares line of each metric per million inhabitants against R&D or HDI, over the countries with data.',
+  fn: (country_metrics) => {
+    const out = [];
+    for (const y of ['authors_pmi', 'papers_pmi', 'citations_pmi']) {
+      for (const x of ['rd_avg', 'hdi_avg']) {
+        const p = country_metrics.filter((r) => r[x] != null && r[x] !== '' && r[y] != null).map((r) => [+r[x], +r[y]]);
+        const n = p.length, mx = p.reduce((a, q) => a + q[0], 0) / n, my = p.reduce((a, q) => a + q[1], 0) / n;
+        let sxx = 0, sxy = 0, syy = 0, res = 0;
+        for (const [a, b] of p) { sxx += (a - mx) ** 2; sxy += (a - mx) * (b - my); syy += (b - my) ** 2; }
+        const slope = sxy / sxx, intercept = my - slope * mx;
+        for (const [a, b] of p) res += (b - intercept - slope * a) ** 2;
+        out.push({ fit: `${y}|${x}`, metric: y, x, n, slope, intercept, r2: 1 - res / syy });
+      }
+    }
+    return out;
+  },
+});
+
+dash.calc('region_share', {
+  inputs: ['world_share'],
+  title: 'African share per year',
+  description: 'African papers and citations as a percentage of the global output of the same year.',
+  fn: (world_share) => world_share.map((r) => ({
+    year: +r.year,
+    pct_papers: 100 * r.region_papers / r.world_papers,
+    pct_citations: r.world_citations ? 100 * r.region_citations / r.world_citations : null,
+  })),
+});
+
+// tabs
+const showTab = (name) => {
+  document.querySelectorAll('.rp [role="tabpanel"]').forEach((s) => { s.hidden = s.id !== name; });
+  document.querySelectorAll('.rp .tab').forEach((b) => b.setAttribute('aria-selected', String(b.dataset.tab === name)));
+};
+document.querySelectorAll('.rp .tab').forEach((b) => b.addEventListener('click', () => { showTab(b.dataset.tab); dash.setLink(b.dataset.tab); }));
+const startTab = location.hash.slice(1);
+if (startTab && document.querySelector(`.rp .tab[data-tab="${CSS.escape(startTab)}"]`)) showTab(startTab);
+
+document.querySelectorAll('#rp-search').forEach((i) => i.addEventListener('input', () => { rp.ui.q = i.value.trim().toLowerCase(); dash.draw('cells-body'); }));
+document.querySelectorAll('.rp .sw, .rp .sq[data-i]').forEach((s) => { s.style.background = dash.colors[+s.dataset.i]; });
+document.querySelectorAll('.rp .dot.fill').forEach((s) => { s.style.background = dash.colors[0]; });
+
+dash.draw('value', (el) => {
+  const d = dash.data(el.dataset.source);
+  const [k, ...v] = (el.dataset.where || '').split('=');
+  const r = d.status === 'ok' ? d.data.find((row) => String(row[k]) === v.join('=')) : null;
+  const val = r ? r[el.dataset.field] : null;
+  el.textContent = val == null || val === '' ? '—' : el.dataset.fmt === 'r2' ? rp.r2(+val) : el.dataset.fmt === 'int' ? rp.int(+val) : rp.num(val);
+});
+
+dash.draw('r2-body', (tb) => {
+  tb.replaceChildren();
+  const d = dash.data('scalars'); if (d.status !== 'ok') return;
+  for (const r of d.data.filter((s) => s.group === 'R²')) {
+    const tr = rp.row(tb, r.id);
+    rp.cell(tr, r.label); rp.cell(tr, rp.int(r.n), 'n'); rp.cell(tr, rp.r2(r.value), 'n');
+  }
+});
+
+dash.draw('table-select', (sel) => {
+  const d = dash.data('table_cells');
+  const tables = d.status === 'ok' ? [...new Set(d.data.map((c) => c.table))] : [];
+  sel.replaceChildren(...tables.map((t) => new Option(t, t)));
+  if (!rp.ui.table || !tables.includes(rp.ui.table)) rp.ui.table = tables[0] || null;
+  sel.value = rp.ui.table || '';
+  sel.onchange = () => { rp.ui.table = sel.value; dash.draw('cells-body'); };
+});
+
+dash.draw('cells-body', (tb) => {
+  tb.replaceChildren();
+  const d = dash.data('table_cells'); if (d.status !== 'ok') return;
+  const table = rp.ui.table || (d.data[0] && d.data[0].table);
+  for (const c of d.data) {
+    if (c.table !== table) continue;
+    if (rp.ui.q && !(`${c.country} ${c.column}`.toLowerCase().includes(rp.ui.q))) continue;
+    const tr = rp.row(tb, c.id);
+    rp.cell(tr, c.country); rp.cell(tr, c.column);
+    rp.cell(tr, rp.num(c.value), 'n');
+  }
+});
+
+dash.draw('gender-rank-body', (tb) => {
+  tb.replaceChildren();
+  const d = dash.data('gender_rank'); if (d.status !== 'ok') return;
+  const pm = (p, c) => `${d3.format('.1f')(p)} ± ${d3.format('.1f')(c)}`;
+  for (const r of d.data) {
+    const tr = rp.row(tb, r.group);
+    rp.cell(tr, r.group); rp.cell(tr, rp.int(r.authors), 'n'); rp.cell(tr, r.authors ? pm(r.female_pct, r.ci95) : '—', 'n');
+  }
+});
+
+dash.draw('scatter', (el) => {
+  if (!rp.ready(el, ['country_metrics', 'fits'])) return;
+  const xk = el.dataset.x, yk = el.dataset.metric;
+  const rows = dash.data('country_metrics').data.filter((r) => r[xk] != null && r[xk] !== '' && r[yk] != null);
+  const fit = dash.data('fits').data.find((f) => f.fit === `${yk}|${xk}`);
+  const W = Math.max(280, el.clientWidth), H = 256, mb = 24;
+  el.replaceChildren();
+  const svg = d3.select(el).append('svg').attr('width', '100%').attr('viewBox', `0 0 ${W} ${H}`);
+  const y = d3.scaleLinear([0, d3.max(rows, (r) => +r[yk]) * 1.05], [H - mb, 10]).nice();
+  const yfmt = d3.format('~s');
+  const ml = rp.textW(svg, y.ticks(5).map(yfmt)) + 10;
+  const x = d3.scaleLinear(d3.extent(rows, (r) => +r[xk]), [ml + 6, W - 34]).nice();
+  rp.axes(svg, x, y, W, H, ml, mb, xk === 'hdi_avg' ? d3.format('.2f') : d3.format('.1f'), yfmt);
+  if (fit) {
+    const [x0, x1] = x.domain();
+    const clampY = (v) => Math.max(y.domain()[0], Math.min(y.domain()[1], v));
+    svg.append('line').attr('x1', x(x0)).attr('x2', x(x1))
+      .attr('y1', y(clampY(fit.intercept + fit.slope * x0))).attr('y2', y(clampY(fit.intercept + fit.slope * x1)))
+      .attr('stroke', dash.colors[1]).attr('stroke-width', 2).attr('stroke-linecap', 'round').attr('stroke-dasharray', '6 4');
+  }
+  const pts = svg.append('g');
+  pts.selectAll('circle').data(rows).join('circle').attr('cx', (r) => x(+r[xk])).attr('cy', (r) => y(+r[yk])).attr('r', 4)
+    .attr('fill', dash.colors[0]);
+  pts.selectAll('text').data(rows).join('text').attr('x', (r) => x(+r[xk]) + 6).attr('y', (r) => y(+r[yk]) + 4).text((r) => r.code);
+  const tip = rp.tip(el);
+  const unit = { authors_pmi: 'authors', papers_pmi: 'publications', citations_pmi: 'citations' }[yk];
+  svg.on('pointermove', (ev) => {
+    const [px, py] = d3.pointer(ev, el);
+    const r = d3.least(rows, (q) => (x(+q[xk]) - px) ** 2 + (y(+q[yk]) - py) ** 2);
+    if (!r) return;
+    tip.show([r.country, `${xk === 'hdi_avg' ? 'HDI' : 'R&D, % of GDP'}: ${r[xk]}`, `${rp.num(r[yk])} ${unit} per million`], x(+r[xk]), y(+r[yk]));
+  }).on('pointerleave', () => tip.hide());
+});
+
+dash.draw('share-chart', (el) => {
+  if (!rp.ready(el, ['region_share'])) return;
+  const rows = dash.data('region_share').data;
+  const W = Math.max(300, el.clientWidth), H = 330, mb = 24;
+  el.replaceChildren();
+  const svg = d3.select(el).append('svg').attr('width', '100%').attr('viewBox', `0 0 ${W} ${H}`);
+  const y = d3.scaleLinear([0, d3.max(rows, (r) => Math.max(r.pct_papers, r.pct_citations || 0))], [H - mb, 10]).nice();
+  const yfmt = (v) => `${v}%`;
+  const ml = rp.textW(svg, y.ticks(5).map(yfmt)) + 10;
+  const x = d3.scaleLinear(d3.extent(rows, (r) => r.year), [ml + 4, W - 10]);
+  rp.axes(svg, x, y, W, H, ml, mb, d3.format('d'), yfmt);
+  ['pct_papers', 'pct_citations'].forEach((k, i) => {
+    svg.append('path').datum(rows.filter((r) => r[k] != null))
+      .attr('d', d3.line((r) => x(r.year), (r) => y(r[k])))
+      .attr('fill', 'none').attr('stroke', dash.colors[i]).attr('stroke-width', 2).attr('stroke-linejoin', 'round').attr('stroke-linecap', 'round');
+  });
+  const rule = svg.append('line').attr('y1', 10).attr('y2', H - mb).attr('stroke', 'var(--cds-chart-reference)').attr('visibility', 'hidden');
+  const tip = rp.tip(el);
+  svg.on('pointermove', (ev) => {
+    const [px] = d3.pointer(ev, el);
+    const r = d3.least(rows, (q) => Math.abs(x(q.year) - px)); if (!r) return;
+    rule.attr('x1', x(r.year)).attr('x2', x(r.year)).attr('visibility', 'visible');
+    tip.show([String(r.year), `Publications ${d3.format('.2f')(r.pct_papers)}%`, `Citations ${r.pct_citations == null ? '—' : d3.format('.2f')(r.pct_citations) + '%'}`], x(r.year), y(r.pct_papers));
+  }).on('pointerleave', () => { tip.hide(); rule.attr('visibility', 'hidden'); });
+});
+
+dash.draw('country-select', (sel) => {
+  const d = dash.data('papers_per_year');
+  const cs = d.status === 'ok' ? [...new Set(d.data.map((r) => r.country))] : [];
+  sel.replaceChildren(...cs.map((c) => new Option(c, c)));
+  if (!cs.includes(rp.ui.country)) rp.ui.country = cs[0] || null;
+  sel.value = rp.ui.country || '';
+  sel.onchange = () => { rp.ui.country = sel.value; dash.draw('year-chart'); };
+});
+
+dash.draw('year-chart', (el) => {
+  if (!rp.ready(el, ['papers_per_year'])) return;
+  const rows = dash.data('papers_per_year').data.filter((r) => r.country === rp.ui.country).map((r) => ({ year: +r.year, papers: +r.papers }));
+  el.replaceChildren();
+  if (!rows.length) return;
+  const years = d3.range(d3.min(rows, (r) => r.year), d3.max(rows, (r) => r.year) + 1);
+  const by = new Map(rows.map((r) => [r.year, r.papers]));
+  const W = Math.max(300, el.clientWidth), H = 256, mb = 24;
+  const svg = d3.select(el).append('svg').attr('width', '100%').attr('viewBox', `0 0 ${W} ${H}`);
+  const y = d3.scaleLinear([0, d3.max(rows, (r) => r.papers)], [H - mb, 10]).nice();
+  const ml = rp.textW(svg, y.ticks(5).map(d3.format(','))) + 10;
+  const x = d3.scaleBand(years, [ml + 4, W - 6]).padding(0.15);
+  svg.append('g').attr('transform', `translate(${ml},0)`).call(d3.axisLeft(y).ticks(5).tickSize(-(W - ml - 8)).tickFormat(d3.format(',')))
+    .attr('font-size', null).attr('font-family', null).call((g) => g.select('.domain').remove());
+  const step = Math.max(1, Math.ceil(years.length / Math.max(2, Math.floor((W - ml) / 48))));
+  svg.append('g').attr('transform', `translate(0,${H - mb})`).call(d3.axisBottom(x).tickValues(years.filter((yy, i) => i % step === 0)).tickFormat(d3.format('d')))
+    .attr('font-size', null).attr('font-family', null);
+  svg.append('g').selectAll('rect').data(years).join('rect')
+    .attr('x', (yy) => x(yy)).attr('width', Math.min(32, x.bandwidth())).attr('y', (yy) => y(by.get(yy) || 0))
+    .attr('height', (yy) => y(0) - y(by.get(yy) || 0)).attr('rx', Math.min(2, x.bandwidth() / 2)).attr('fill', dash.colors[0]);
+  const tip = rp.tip(el);
+  svg.on('pointermove', (ev) => {
+    const [px] = d3.pointer(ev, el);
+    const yy = d3.least(years, (q) => Math.abs(x(q) + x.bandwidth() / 2 - px)); if (yy == null) return;
+    tip.show([String(yy), `${rp.int(by.get(yy) || 0)} articles`], x(yy), y(by.get(yy) || 0));
+  }).on('pointerleave', () => tip.hide());
+});
+
+dash.draw('pubs-dots', (el) => {
+  if (!rp.ready(el, ['country_metrics'])) return;
+  const rows = dash.data('country_metrics').data.map((c) => ({ country: c.country, papers: +c.papers }))
+    .filter((r) => r.papers > 0).sort((a, b) => b.papers - a.papers);
+  el.replaceChildren();
+  if (!rows.length) return;
+  const W = Math.max(300, el.clientWidth), rh = 18, mt = 6, mb = 24, H = mt + rows.length * rh + mb;
+  const svg = d3.select(el).append('svg').attr('width', '100%').attr('viewBox', `0 0 ${W} ${H}`);
+  const ml = rp.textW(svg, rows.map((r) => r.country)) + 12;
+  const x = d3.scaleLog([0.7, d3.max(rows, (r) => r.papers) * 1.3], [ml, W - 12]);
+  const y = d3.scaleBand(rows.map((r) => r.country), [mt, H - mb]).padding(0.3);
+  svg.append('g').attr('transform', `translate(0,${H - mb})`).call(d3.axisBottom(x).ticks(Math.max(2, Math.floor((W - ml) / 80)), ',').tickSize(-(H - mb - mt)))
+    .attr('font-size', null).attr('font-family', null).call((g) => g.select('.domain').remove());
+  svg.append('g').selectAll('text').data(rows).join('text').attr('x', ml - 8).attr('y', (r) => y(r.country) + y.bandwidth() / 2)
+    .attr('dy', '0.32em').attr('text-anchor', 'end').text((r) => r.country);
+  const g = svg.append('g').selectAll('g').data(rows).join('g').attr('transform', (r) => `translate(0,${y(r.country) + y.bandwidth() / 2})`);
+  g.append('line').attr('x1', x(0.7)).attr('x2', (r) => x(r.papers)).attr('stroke', 'var(--cds-chart-muted)').attr('stroke-width', 2);
+  g.append('circle').attr('cx', (r) => x(r.papers)).attr('r', 4.5).attr('fill', dash.colors[0]);
+  const tip = rp.tip(el);
+  svg.on('pointermove', (ev) => {
+    const [, py] = d3.pointer(ev, el);
+    const r = d3.least(rows, (q) => Math.abs(y(q.country) + y.bandwidth() / 2 - py)); if (!r) return;
+    tip.show([r.country, `${rp.int(r.papers)} articles`], x(r.papers), y(r.country));
+  }).on('pointerleave', () => tip.hide());
+});
+
+rp.regions = ['Same country', 'Other African country', 'Outside Africa'];
+rp.regionColor = { 'Same country': 0, 'Other African country': 2, 'Outside Africa': 1 };
+rp.rankName = { UNDERGRADUATE: 'Undergraduate', PHD: 'PhD', POSTDOC: 'Postdoc', JUNIOR: 'Junior', SENIOR: 'Senior' };
+
+dash.draw('mob-select', (sel) => {
+  const d = dash.data('mobility');
+  const tot = d3.rollup(d.status === 'ok' ? d.data : [], (v) => d3.sum(v, (r) => +r.n), (r) => r.country);
+  const cs = [...tot.keys()].sort((a, b) => tot.get(b) - tot.get(a));
+  sel.replaceChildren(...cs.map((c) => new Option(c, c)));
+  if (!cs.includes(rp.ui.mobCountry)) rp.ui.mobCountry = cs[0] || null;
+  sel.value = rp.ui.mobCountry || '';
+  sel.onchange = () => { rp.ui.mobCountry = sel.value; dash.draw('mob-chart'); };
+});
+
+dash.draw('mob-chart', (el) => {
+  if (!rp.ready(el, ['mobility'])) return;
+  const ranks = Object.keys(rp.rankName);
+  const data = dash.data('mobility').data.filter((r) => r.country === rp.ui.mobCountry);
+  const by = new Map(ranks.map((k) => [k, Object.fromEntries(rp.regions.map((g) => [g, 0]))]));
+  for (const r of data) if (by.has(r.rank)) by.get(r.rank)[r.region] = +r.n;
+  const stacked = d3.stack().keys(rp.regions)(ranks.map((k) => ({ rank: k, ...by.get(k) })));
+  el.replaceChildren();
+  const W = Math.max(300, el.clientWidth), H = 330, mb = 24;
+  const svg = d3.select(el).append('svg').attr('width', '100%').attr('viewBox', `0 0 ${W} ${H}`);
+  const y = d3.scaleLinear([0, d3.max(stacked.at(-1), (s) => s[1]) || 1], [H - mb, 10]).nice();
+  const ml = rp.textW(svg, y.ticks(5).map(d3.format(','))) + 10;
+  const x = d3.scaleBand(ranks, [ml + 4, W - 6]).padding(0.35);
+  svg.append('g').attr('transform', `translate(${ml},0)`).call(d3.axisLeft(y).ticks(5).tickSize(-(W - ml - 8)).tickFormat(d3.format(',')))
+    .attr('font-size', null).attr('font-family', null).call((g) => g.select('.domain').remove());
+  svg.append('g').attr('transform', `translate(0,${H - mb})`).call(d3.axisBottom(x).tickFormat((k) => rp.rankName[k]))
+    .attr('font-size', null).attr('font-family', null);
+  svg.append('g').selectAll('g').data(stacked).join('g').attr('fill', (s) => dash.colors[rp.regionColor[s.key]])
+    .selectAll('rect').data((s) => s).join('rect')
+    .attr('x', (s) => x(s.data.rank)).attr('width', x.bandwidth()).attr('y', (s) => y(s[1])).attr('height', (s) => Math.max(0, y(s[0]) - y(s[1]) - 1));
+  const tip = rp.tip(el);
+  svg.on('pointermove', (ev) => {
+    const [px] = d3.pointer(ev, el);
+    const k = d3.least(ranks, (q) => Math.abs(x(q) + x.bandwidth() / 2 - px)); if (!k) return;
+    const v = by.get(k);
+    tip.show([`${rp.ui.mobCountry} · ${rp.rankName[k]}`, ...rp.regions.map((g) => `${g}: ${rp.int(v[g])}`)], x(k) + x.bandwidth(), y(d3.sum(rp.regions, (g) => v[g])));
+  }).on('pointerleave', () => tip.hide());
+});
+
+rp.destinations = [...rp.regions, 'Country not known', 'No later position'];
+
+dash.draw('phd-finding', (el) => {
+  const d = dash.data('phd_destination'); if (d.status !== 'ok') { el.textContent = '—'; return; }
+  const share = (c, g) => { const r = d.data.find((q) => q.country === c && q.destination === g); const t = d.data.find((q) => q.country === c); return r && t ? 100 * r.authors / t.total : 0; };
+  const big = [...new Set(d.data.filter((r) => r.total >= 10 && r.country !== 'All Africa').map((r) => r.country))];
+  if (!big.length) { el.textContent = '—'; return; }
+  const top = d3.greatest(big, (c) => share(c, 'Outside Africa'));
+  const others = big.filter((c) => c !== top).sort((a, b) => share(b, 'Outside Africa') - share(a, 'Outside Africa')).slice(0, 3);
+  el.replaceChildren();
+  const b = (t) => { const e = document.createElement('b'); e.textContent = t; return e; };
+  el.append(`Of the authors who held a PhD position in ${top}, `, b(`${d3.format('.0f')(share(top, 'Outside Africa'))}%`),
+    ` now hold a position outside Africa, against `,
+    b(others.map((c) => `${d3.format('.0f')(share(c, 'Outside Africa'))}%`).join(', ')),
+    ` for ${others.join(', ')} and `, b(`${d3.format('.0f')(share('All Africa', 'Outside Africa'))}%`), ' for the region.');
+});
+
+dash.draw('phd-chart', (el) => {
+  if (!rp.ready(el, ['phd_destination'])) return;
+  const d = dash.data('phd_destination').data;
+  const cs = [...new Set(d.filter((r) => r.total >= 10).map((r) => r.country))];
+  const rows = cs.map((c) => {
+    const o = { country: c, total: d.find((r) => r.country === c).total };
+    for (const g of rp.destinations) { const r = d.find((q) => q.country === c && q.destination === g); o[g] = r ? 100 * r.authors / o.total : 0; }
+    return o;
+  });
+  el.replaceChildren();
+  const W = Math.max(300, el.clientWidth), rh = 30, mt = 4, mb = 24, H = mt + rows.length * rh + mb;
+  const svg = d3.select(el).append('svg').attr('width', '100%').attr('viewBox', `0 0 ${W} ${H}`);
+  const labels = rows.map((r) => `${r.country} (${rp.int(r.total)})`);
+  const ml = rp.textW(svg, labels) + 12;
+  const x = d3.scaleLinear([0, 100], [ml, W - 12]);
+  const y = d3.scaleBand(rows.map((r) => r.country), [mt, H - mb]).padding(0.25);
+  svg.append('g').attr('transform', `translate(0,${H - mb})`).call(d3.axisBottom(x).ticks(5).tickFormat((v) => `${v}%`))
+    .attr('font-size', null).attr('font-family', null);
+  svg.append('g').selectAll('text').data(rows).join('text').attr('x', ml - 8).attr('y', (r) => y(r.country) + y.bandwidth() / 2)
+    .attr('dy', '0.32em').attr('text-anchor', 'end').attr('font-weight', (r) => r.country === 'All Africa' ? 600 : null)
+    .text((r, i) => labels[i]);
+  const fill = (g) => g in rp.regionColor ? dash.colors[rp.regionColor[g]] : g === 'Country not known' ? 'var(--cds-chart-muted)' : 'none';
+  const stacked = d3.stack().keys(rp.destinations)(rows);
+  svg.append('g').selectAll('g').data(stacked).join('g').attr('fill', (s) => fill(s.key))
+    .attr('stroke', (s) => s.key === 'No later position' ? 'var(--color-fg-muted)' : null).attr('stroke-dasharray', (s) => s.key === 'No later position' ? '3 2' : null)
+    .selectAll('rect').data((s) => s).join('rect')
+    .attr('x', (s) => x(s[0])).attr('width', (s) => Math.max(0, x(s[1]) - x(s[0]) - 1)).attr('y', (s) => y(s.data.country)).attr('height', y.bandwidth());
+  const tip = rp.tip(el);
+  svg.on('pointermove', (ev) => {
+    const [, py] = d3.pointer(ev, el);
+    const r = d3.least(rows, (q) => Math.abs(y(q.country) + y.bandwidth() / 2 - py)); if (!r) return;
+    tip.show([`${r.country} · ${rp.int(r.total)} PhDs`, ...rp.destinations.map((g) => `${g}: ${d3.format('.0f')(r[g])}%`)], x(100) - 160, y(r.country));
+  }).on('pointerleave', () => tip.hide());
+});
+
+dash.draw('heatmap', (el) => {
+  if (!rp.ready(el, ['collab'])) return;
+  const scope = el.dataset.scope;
+  const rows = dash.data('collab').data.filter((r) => r.scope === scope);
+  const rnames = [...new Set(rows.map((r) => r.row))], cnames = [...new Set(rows.map((r) => r.col))];
+  const short = { 'Dominican Republic': 'Dom. Rep.', 'Costa Rica': 'Costa Rica', 'El Salvador': 'El Salvador', 'United Kingdom': 'UK', 'United States': 'USA', 'Russian Federation': 'Russia' };
+  const W = Math.max(300, el.clientWidth);
+  el.replaceChildren();
+  const svg = d3.select(el).append('svg').attr('width', '100%');
+  const ml = rp.textW(svg, rnames) + 8;
+  const top = rp.textW(svg, cnames.map((c) => short[c] || c)) * 0.75 + 12;
+  const cw = Math.min(44, (W - ml - 4) / cnames.length), ch = Math.max(16, Math.min(28, cw * 0.8));
+  const H = top + ch * rnames.length + 4;
+  svg.attr('viewBox', `0 0 ${W} ${H}`);
+  const op = d3.scaleSqrt([0, 100], [0.04, 1]);
+  const g = svg.append('g');
+  g.selectAll('rect').data(rows).join('rect')
+    .attr('x', (r) => ml + cnames.indexOf(r.col) * cw).attr('y', (r) => top + rnames.indexOf(r.row) * ch)
+    .attr('width', cw - 1).attr('height', ch - 1).attr('rx', 2)
+    .attr('fill', (r) => (r.row === r.col ? 'var(--cds-chart-muted)' : dash.colors[0]))
+    .attr('fill-opacity', (r) => (r.row === r.col ? 0.3 : op(+r.pct)));
+  if (cw >= 30) {
+    g.selectAll('text').data(rows.filter((r) => r.row !== r.col && +r.pct > 0)).join('text')
+      .attr('x', (r) => ml + cnames.indexOf(r.col) * cw + cw / 2).attr('y', (r) => top + rnames.indexOf(r.row) * ch + ch / 2 + 4)
+      .attr('text-anchor', 'middle').style('fill', (r) => (op(+r.pct) > 0.6 ? 'var(--color-bg)' : 'var(--color-fg)'))
+      .text((r) => d3.format('.1~f')(+r.pct));
+  }
+  svg.append('g').selectAll('text').data(rnames).join('text').attr('x', ml - 6).attr('y', (n, i) => top + i * ch + ch / 2 + 4).attr('text-anchor', 'end').text((n) => n);
+  svg.append('g').selectAll('text').data(cnames).join('text')
+    .attr('transform', (n, i) => `translate(${ml + i * cw + cw / 2},${top - 6}) rotate(-50)`).text((n) => short[n] || n);
+  const tip = rp.tip(el);
+  svg.on('pointermove', (ev) => {
+    const [px, py] = d3.pointer(ev, el);
+    const ci = Math.floor((px - ml) / cw), ri = Math.floor((py - top) / ch);
+    if (ci < 0 || ri < 0 || ci >= cnames.length || ri >= rnames.length) { tip.hide(); return; }
+    const r = rows.find((q) => q.row === rnames[ri] && q.col === cnames[ci]); if (!r) return;
+    tip.show([`${r.row} with ${r.col}`, `${d3.format('.1f')(+r.pct)}% of ${r.row}'s articles`], ml + ci * cw + cw / 2, top + ri * ch);
+  }).on('pointerleave', () => tip.hide());
+});
+
+dash.draw('gender-chart', (el) => {
+  if (!rp.ready(el, ['gender_year'])) return;
+  const rows = dash.data('gender_year').data.map((r) => ({ year: +r.year, p: +r.female_pct, ci: +r.ci95, n: +r.authors }));
+  const W = Math.max(300, el.clientWidth), H = 300, mb = 24;
+  el.replaceChildren();
+  const svg = d3.select(el).append('svg').attr('width', '100%').attr('viewBox', `0 0 ${W} ${H}`);
+  const y = d3.scaleLinear([0, d3.max(rows, (r) => r.p + r.ci)], [H - mb, 10]).nice();
+  const yfmt = (v) => `${v}%`;
+  const ml = rp.textW(svg, y.ticks(5).map(yfmt)) + 10;
+  const x = d3.scaleLinear(d3.extent(rows, (r) => r.year), [ml + 4, W - 10]);
+  rp.axes(svg, x, y, W, H, ml, mb, d3.format('d'), yfmt);
+  svg.append('path').datum(rows).attr('d', d3.area((r) => x(r.year), (r) => y(Math.max(0, r.p - r.ci)), (r) => y(r.p + r.ci)))
+    .attr('fill', dash.colors[0]).attr('fill-opacity', 0.16);
+  svg.append('path').datum(rows).attr('d', d3.line((r) => x(r.year), (r) => y(r.p)))
+    .attr('fill', 'none').attr('stroke', dash.colors[0]).attr('stroke-width', 2).attr('stroke-linejoin', 'round').attr('stroke-linecap', 'round');
+  const dot = svg.append('circle').attr('r', 4).attr('fill', dash.colors[0]).attr('visibility', 'hidden');
+  const tip = rp.tip(el);
+  svg.on('pointermove', (ev) => {
+    const [px] = d3.pointer(ev, el);
+    const r = d3.least(rows, (q) => Math.abs(x(q.year) - px)); if (!r) return;
+    dot.attr('cx', x(r.year)).attr('cy', y(r.p)).attr('visibility', 'visible');
+    tip.show([String(r.year), `Female ${d3.format('.1f')(r.p)}% ± ${d3.format('.1f')(r.ci)}`, `${rp.int(r.n)} authors with gender`], x(r.year), y(r.p));
+  }).on('pointerleave', () => { tip.hide(); dot.attr('visibility', 'hidden'); });
+});
+</script>

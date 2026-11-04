@@ -1,0 +1,434 @@
+[
+ {
+  "iso2": "DZ",
+  "iso3": "DZA",
+  "name": "Algeria",
+  "population": 47435312,
+  "rd_avg": 0.281,
+  "hdi_avg": 0.682
+ },
+ {
+  "iso2": "AO",
+  "iso3": "AGO",
+  "name": "Angola",
+  "population": 39040039,
+  "rd_avg": 0.032,
+  "hdi_avg": 0.511
+ },
+ {
+  "iso2": "BJ",
+  "iso3": "BEN",
+  "name": "Benin",
+  "population": 14814460,
+  "rd_avg": null,
+  "hdi_avg": 0.447
+ },
+ {
+  "iso2": "BW",
+  "iso3": "BWA",
+  "name": "Botswana",
+  "population": 2562122,
+  "rd_avg": 0.454,
+  "hdi_avg": 0.63
+ },
+ {
+  "iso2": "BF",
+  "iso3": "BFA",
+  "name": "Burkina Faso",
+  "population": 24074580,
+  "rd_avg": 0.209,
+  "hdi_avg": 0.374
+ },
+ {
+  "iso2": "BI",
+  "iso3": "BDI",
+  "name": "Burundi",
+  "population": 14390003,
+  "rd_avg": 0.159,
+  "hdi_avg": 0.355
+ },
+ {
+  "iso2": "CV",
+  "iso3": "CPV",
+  "name": "Cabo Verde",
+  "population": 527326,
+  "rd_avg": 0.066,
+  "hdi_avg": 0.642
+ },
+ {
+  "iso2": "CM",
+  "iso3": "CMR",
+  "name": "Cameroon",
+  "population": 29879337,
+  "rd_avg": null,
+  "hdi_avg": 0.49
+ },
+ {
+  "iso2": "CF",
+  "iso3": "CAF",
+  "name": "Central African Republic",
+  "population": 5513282,
+  "rd_avg": null,
+  "hdi_avg": 0.343
+ },
+ {
+  "iso2": "TD",
+  "iso3": "TCD",
+  "name": "Chad",
+  "population": 21003705,
+  "rd_avg": 0.233,
+  "hdi_avg": 0.36
+ },
+ {
+  "iso2": "KM",
+  "iso3": "COM",
+  "name": "Comoros",
+  "population": 882847,
+  "rd_avg": null,
+  "hdi_avg": 0.529
+ },
+ {
+  "iso2": "CG",
+  "iso3": "COG",
+  "name": "Congo",
+  "population": 6484437,
+  "rd_avg": 0.383,
+  "hdi_avg": 0.556
+ },
+ {
+  "iso2": "CD",
+  "iso3": "COD",
+  "name": "Congo, The Democratic Republic of the",
+  "population": 112832473,
+  "rd_avg": 0.156,
+  "hdi_avg": 0.412
+ },
+ {
+  "iso2": "CI",
+  "iso3": "CIV",
+  "name": "Côte d'Ivoire",
+  "population": 32711547,
+  "rd_avg": 0.07,
+  "hdi_avg": 0.47
+ },
+ {
+  "iso2": "DJ",
+  "iso3": "DJI",
+  "name": "Djibouti",
+  "population": 1184076,
+  "rd_avg": null,
+  "hdi_avg": 0.412
+ },
+ {
+  "iso2": "EG",
+  "iso3": "EGY",
+  "name": "Egypt",
+  "population": 118365995,
+  "rd_avg": 0.535,
+  "hdi_avg": 0.652
+ },
+ {
+  "iso2": "GQ",
+  "iso3": "GNQ",
+  "name": "Equatorial Guinea",
+  "population": 1938431,
+  "rd_avg": null,
+  "hdi_avg": 0.608
+ },
+ {
+  "iso2": "ER",
+  "iso3": "ERI",
+  "name": "Eritrea",
+  "population": 3607003,
+  "rd_avg": null,
+  "hdi_avg": 0.474
+ },
+ {
+  "iso2": "SZ",
+  "iso3": "SWZ",
+  "name": "Eswatini",
+  "population": 1256174,
+  "rd_avg": 0.278,
+  "hdi_avg": 0.521
+ },
+ {
+  "iso2": "ET",
+  "iso3": "ETH",
+  "name": "Ethiopia",
+  "population": 135472051,
+  "rd_avg": 0.294,
+  "hdi_avg": 0.407
+ },
+ {
+  "iso2": "GA",
+  "iso3": "GAB",
+  "name": "Gabon",
+  "population": 2593130,
+  "rd_avg": 0.502,
+  "hdi_avg": 0.651
+ },
+ {
+  "iso2": "GM",
+  "iso3": "GMB",
+  "name": "Gambia",
+  "population": 2822093,
+  "rd_avg": 0.044,
+  "hdi_avg": 0.422
+ },
+ {
+  "iso2": "GH",
+  "iso3": "GHA",
+  "name": "Ghana",
+  "population": 35064272,
+  "rd_avg": 0.304,
+  "hdi_avg": 0.534
+ },
+ {
+  "iso2": "GN",
+  "iso3": "GIN",
+  "name": "Guinea",
+  "population": 15099727,
+  "rd_avg": null,
+  "hdi_avg": 0.384
+ },
+ {
+  "iso2": "GW",
+  "iso3": "GNB",
+  "name": "Guinea-Bissau",
+  "population": 2249515,
+  "rd_avg": null,
+  "hdi_avg": 0.456
+ },
+ {
+  "iso2": "KE",
+  "iso3": "KEN",
+  "name": "Kenya",
+  "population": 57532493,
+  "rd_avg": 0.614,
+  "hdi_avg": 0.531
+ },
+ {
+  "iso2": "LS",
+  "iso3": "LSO",
+  "name": "Lesotho",
+  "population": 2363325,
+  "rd_avg": 0.047,
+  "hdi_avg": 0.479
+ },
+ {
+  "iso2": "LR",
+  "iso3": "LBR",
+  "name": "Liberia",
+  "population": 5731206,
+  "rd_avg": null,
+  "hdi_avg": 0.458
+ },
+ {
+  "iso2": "LY",
+  "iso3": "LBY",
+  "name": "Libya",
+  "population": 7458555,
+  "rd_avg": null,
+  "hdi_avg": 0.751
+ },
+ {
+  "iso2": "MG",
+  "iso3": "MDG",
+  "name": "Madagascar",
+  "population": 32740678,
+  "rd_avg": 0.123,
+  "hdi_avg": 0.478
+ },
+ {
+  "iso2": "MW",
+  "iso3": "MWI",
+  "name": "Malawi",
+  "population": 22216120,
+  "rd_avg": 0.178,
+  "hdi_avg": 0.423
+ },
+ {
+  "iso2": "ML",
+  "iso3": "MLI",
+  "name": "Mali",
+  "population": 25198821,
+  "rd_avg": 0.226,
+  "hdi_avg": 0.351
+ },
+ {
+  "iso2": "MR",
+  "iso3": "MRT",
+  "name": "Mauritania",
+  "population": 5315065,
+  "rd_avg": 0.01,
+  "hdi_avg": 0.486
+ },
+ {
+  "iso2": "MU",
+  "iso3": "MUS",
+  "name": "Mauritius",
+  "population": 1243741,
+  "rd_avg": 0.316,
+  "hdi_avg": 0.721
+ },
+ {
+  "iso2": "MA",
+  "iso3": "MAR",
+  "name": "Morocco",
+  "population": 38430770,
+  "rd_avg": 0.507,
+  "hdi_avg": 0.575
+ },
+ {
+  "iso2": "MZ",
+  "iso3": "MOZ",
+  "name": "Mozambique",
+  "population": 35631653,
+  "rd_avg": 0.315,
+  "hdi_avg": 0.359
+ },
+ {
+  "iso2": "NA",
+  "iso3": "NAM",
+  "name": "Namibia",
+  "population": 3092816,
+  "rd_avg": 0.379,
+  "hdi_avg": 0.59
+ },
+ {
+  "iso2": "NE",
+  "iso3": "NER",
+  "name": "Niger",
+  "population": 27917831,
+  "rd_avg": null,
+  "hdi_avg": 0.305
+ },
+ {
+  "iso2": "NG",
+  "iso3": "NGA",
+  "name": "Nigeria",
+  "population": 237527782,
+  "rd_avg": 0.208,
+  "hdi_avg": 0.503
+ },
+ {
+  "iso2": "RW",
+  "iso3": "RWA",
+  "name": "Rwanda",
+  "population": 14569341,
+  "rd_avg": 0.73,
+  "hdi_avg": 0.437
+ },
+ {
+  "iso2": "ST",
+  "iso3": "STP",
+  "name": "Sao Tome and Principe",
+  "population": 240254,
+  "rd_avg": null,
+  "hdi_avg": 0.539
+ },
+ {
+  "iso2": "SN",
+  "iso3": "SEN",
+  "name": "Senegal",
+  "population": 18931966,
+  "rd_avg": 0.435,
+  "hdi_avg": 0.439
+ },
+ {
+  "iso2": "SC",
+  "iso3": "SYC",
+  "name": "Seychelles",
+  "population": 122730,
+  "rd_avg": 0.33,
+  "hdi_avg": 0.778
+ },
+ {
+  "iso2": "SL",
+  "iso3": "SLE",
+  "name": "Sierra Leone",
+  "population": 8819794,
+  "rd_avg": null,
+  "hdi_avg": 0.379
+ },
+ {
+  "iso2": "SO",
+  "iso3": "SOM",
+  "name": "Somalia",
+  "population": 19654739,
+  "rd_avg": null,
+  "hdi_avg": 0.38
+ },
+ {
+  "iso2": "ZA",
+  "iso3": "ZAF",
+  "name": "South Africa",
+  "population": 64747319,
+  "rd_avg": 0.693,
+  "hdi_avg": 0.671
+ },
+ {
+  "iso2": "SS",
+  "iso3": "SSD",
+  "name": "South Sudan",
+  "population": 12188788,
+  "rd_avg": null,
+  "hdi_avg": 0.385
+ },
+ {
+  "iso2": "SD",
+  "iso3": "SDN",
+  "name": "Sudan",
+  "population": 51662147,
+  "rd_avg": 0.349,
+  "hdi_avg": 0.446
+ },
+ {
+  "iso2": "TZ",
+  "iso3": "TZA",
+  "name": "Tanzania",
+  "population": 70545865,
+  "rd_avg": 0.407,
+  "hdi_avg": 0.448
+ },
+ {
+  "iso2": "TG",
+  "iso3": "TGO",
+  "name": "Togo",
+  "population": 8591626,
+  "rd_avg": 0.186,
+  "hdi_avg": 0.463
+ },
+ {
+  "iso2": "TN",
+  "iso3": "TUN",
+  "name": "Tunisia",
+  "population": 12348573,
+  "rd_avg": 0.66,
+  "hdi_avg": 0.675
+ },
+ {
+  "iso2": "UG",
+  "iso3": "UGA",
+  "name": "Uganda",
+  "population": 51384894,
+  "rd_avg": 0.301,
+  "hdi_avg": 0.447
+ },
+ {
+  "iso2": "ZM",
+  "iso3": "ZMB",
+  "name": "Zambia",
+  "population": 21913874,
+  "rd_avg": 0.051,
+  "hdi_avg": 0.486
+ },
+ {
+  "iso2": "ZW",
+  "iso3": "ZWE",
+  "name": "Zimbabwe",
+  "population": 16950795,
+  "rd_avg": null,
+  "hdi_avg": 0.479
+ }
+]

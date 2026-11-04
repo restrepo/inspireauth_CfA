@@ -1,0 +1,4 @@
+[
+ ["<title>HECAP Africa</title>", "<title>HECAP Africa @@YEAR@@</title>"],
+ ["<h1 id=\"title\">HECAP Africa</h1>", "<h1 id=\"title\">HECAP Africa, data of @@DATE@@</h1>"]
+]

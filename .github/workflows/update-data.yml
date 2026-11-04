@@ -1,0 +1,148 @@
+# Builds data/inspire_Africa.json.gz from INSPIRE-HEP when a release is published, makes the
+# board of the new data (self-contained HTML), and publishes it on GitHub Pages (branch
+# gh-pages, boards/<date>/ plus an index of every board).
+#
+# On a release (tag v*):  the data and the board are attached to the release, a pull request puts them
+#                on main (data/inspire_Africa.json.gz, reproduce/board_<year>.html), and the
+#                board is added to GitHub Pages.
+# Manual run:    the same, without a release (publish: false only builds and uploads an artifact).
+# Pull request:  a test on three small countries, with nothing published.
+name: Update data and boards
+
+on:
+  release:
+    types: [published]
+  workflow_dispatch:
+    inputs:
+      publish:
+        description: "Open the pull request and add the board to GitHub Pages"
+        type: boolean
+        default: false
+      countries:
+        description: "Only these countries, ISO codes space-separated (empty: all 54)"
+        default: ""
+  pull_request:
+    paths:
+      - "build/**"
+      - "reproduce/**"
+      - "data/countries.json"
+      - ".github/workflows/update-data.yml"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: update-data-${{ github.event_name }}-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  update:
+    # releases: only tags starting with v (the release event has no tag filter of its own)
+    if: github.event_name != 'release' || startsWith(github.event.release.tag_name, 'v')
+    runs-on: ubuntu-latest
+    timeout-minutes: 300
+    permissions:
+      contents: write          # release assets, branch, gh-pages
+      pull-requests: write
+    env:
+      PUBLISH: ${{ github.event_name == 'release' || (github.event_name == 'workflow_dispatch' && inputs.publish) }}
+      COUNTRIES: ${{ github.event_name == 'pull_request' && 'RW GH SN' || inputs.countries }}
+      TAG: ${{ github.event.release.tag_name }}
+      GH_TOKEN: ${{ github.token }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event_name == 'release' && github.event.repository.default_branch || '' }}
+          lfs: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+      - run: python -m pip install -r reproduce/requirements.txt
+      - uses: actions/cache@v4
+        with:
+          path: ~/.cache/genderize-offline
+          key: genderize-offline-wgnd-2.0-r1
+
+      - name: Dates
+        run: |
+          DATE=$(date -u +%F); YEAR=${DATE:0:4}
+          WORDS=(zero one two three four five six seven eight nine ten eleven twelve)
+          N=$((YEAR - 2022)); MORE=${WORDS[$N]:-$N}
+          { echo "DATE=$DATE"; echo "YEAR=$YEAR"; echo "ACTIVE_FROM=$((YEAR - 5))"; echo "MORE_YEARS=$MORE"; } >> "$GITHUB_ENV"
+
+      - name: Download from INSPIRE-HEP
+        run: |
+          mkdir -p out
+          python build/context.py
+          python build/build_inspire.py --cache build/cache --out out/inspire_Africa.json.gz \
+            ${COUNTRIES:+--countries $COUNTRIES}
+
+      - name: Compute the indicators and make the board
+        run: |
+          python reproduce/reproduce.py out/inspire_Africa.json.gz out/results.json --year "$YEAR"
+          python reproduce/tables.py out/results.json out/page_data.json
+          python reproduce/export_dashboard.py out/page_data.json out/dash/
+          python reproduce/standalone.py out/dash/ "out/board_$YEAR.html" --edits reproduce/dashboard/edits_update.json \
+            --set "YEAR=$YEAR" --set "DATE=$DATE"
+          python - <<'EOF' >> "$GITHUB_STEP_SUMMARY"
+          import json
+          d = json.load(open('out/page_data.json'))
+          print(f"**{d['n_records']:,} records, {d['n_authors']:,} authors, {d['n_papers']:,} papers**\n")
+          print(f"{len(d['COUNTRIES'])} countries with papers, {d['region_total_papers']:,} African papers")
+          EOF
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: inspire-Africa-${{ env.DATE }}
+          path: |
+            out/inspire_Africa.json.gz
+            out/board_*.html
+            out/page_data.json
+          retention-days: 30
+
+      - name: Attach the data and the board to the release
+        if: github.event_name == 'release'
+        run: gh release upload "$TAG" out/inspire_Africa.json.gz "out/board_$YEAR.html" --clobber --repo "$GITHUB_REPOSITORY"
+
+      - name: Pull request with the new data
+        if: env.PUBLISH == 'true'
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          BRANCH="update-inspire-Africa-$DATE"
+          git switch -c "$BRANCH"
+          cp out/inspire_Africa.json.gz data/inspire_Africa.json.gz
+          cp "out/board_$YEAR.html" "reproduce/board_$YEAR.html"
+          git add data/inspire_Africa.json.gz data/countries.json "reproduce/board_$YEAR.html"
+          git commit -m "Update data/inspire_Africa.json.gz from INSPIRE-HEP ($DATE)${TAG:+, release $TAG}"
+          git push -f origin "$BRANCH"
+          BODY=$(python - <<'EOF'
+          import json, os
+          d = json.load(open('out/page_data.json'))
+          print(f"Automatic update from INSPIRE-HEP on {os.environ['DATE']}"
+                + (f" (release {os.environ['TAG']})" if os.environ.get('TAG') else '') + '.\n')
+          print(f"- {d['n_records']:,} records, {d['n_authors']:,} authors, {d['n_papers']:,} papers, "
+                f"{d['gender_known']:,} authors with gender (p >= 0.9)")
+          print(f"- Board: `reproduce/board_{os.environ['YEAR']}.html`, also on GitHub Pages")
+          print('\nUpdate the counts in README.md before merging if they are quoted there.')
+          EOF
+          )
+          gh pr create --base "${{ github.event.repository.default_branch }}" --head "$BRANCH" \
+            --title "Update data/inspire_Africa.json.gz from INSPIRE-HEP ($DATE)" --body "$BODY" \
+            || gh pr edit "$BRANCH" --body "$BODY"
+
+      - name: Add the board to GitHub Pages
+        if: env.PUBLISH == 'true'
+        run: |
+          git fetch origin gh-pages || true
+          if git rev-parse --verify -q origin/gh-pages; then
+            git worktree add site origin/gh-pages && git -C site switch -c gh-pages
+          else
+            git worktree add --orphan -b gh-pages site
+          fi
+          python reproduce/pages_index.py add site --id "$DATE" --board "out/board_$YEAR.html" \
+            --page-data out/page_data.json --title "Data of $DATE" --release "$TAG" \
+            --note "INSPIRE-HEP download of $DATE, papers up to $YEAR"
+          git -C site add -A
+          git -C site commit -m "Board of the data of $DATE${TAG:+ (release $TAG)}"
+          git -C site push origin gh-pages
